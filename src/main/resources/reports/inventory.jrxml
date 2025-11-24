@@ -1,0 +1,606 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61d56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PlanillaInventario" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4eedbb89-b4f6-4469-9ab6-f642a1688cf7">
+<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+<parameter name="REGION_NAME" class="java.lang.String"/>
+<parameter name="UNIT_NAME" class="java.lang.String"/>
+<parameter name="SECTOR_NAME" class="java.lang.String"/>
+<parameter name="RANGO_DESDE" class="java.lang.String"/>
+<parameter name="RANGO_HASTA" class="java.lang.String"/>
+<queryString>
+<![CDATA[SELECT 
+    'A-001' as bien, 
+    'Silla Ergonómica' as especie, 
+    'Modelo X' as datos_adicionales, 
+    'CBR Stgo' as conservador,
+    '12345' as inscripcion,
+    '2023' as anio_insc,
+    'Rol-1' as rol_avaluo,
+    'Motor-X' as motor,
+    'Chasis-Y' as chasis,
+    'Placa-Z' as placa,
+    'Bueno' as estado,
+    '2023' as fub_anio,
+    '100' as fub_num,
+    '2023' as voucher_anio,
+    '500' as voucher_num,
+    '101' as oficina_num
+UNION ALL
+SELECT 
+    'A-002' as bien, 
+    'Escritorio Madera' as especie, 
+    'Roble' as datos_adicionales, 
+    '' as conservador,
+    '' as inscripcion,
+    '' as anio_insc,
+    '' as rol_avaluo,
+    '' as motor,
+    '' as chasis,
+    '' as placa,
+    'Regular' as estado,
+    '2022' as fub_anio,
+    '99' as fub_num,
+    '2022' as voucher_anio,
+    '499' as voucher_num,
+    '102' as oficina_num]]>
+</queryString>
+<field name="bien" class="java.lang.String"/>
+<field name="especie" class="java.lang.String"/>
+<field name="datos_adicionales" class="java.lang.String"/>
+<field name="conservador" class="java.lang.String"/>
+<field name="inscripcion" class="java.lang.String"/>
+<field name="anio_insc" class="java.lang.String"/>
+<field name="rol_avaluo" class="java.lang.String"/>
+<field name="motor" class="java.lang.String"/>
+<field name="chasis" class="java.lang.String"/>
+<field name="placa" class="java.lang.String"/>
+<field name="estado" class="java.lang.String"/>
+<field name="fub_anio" class="java.lang.String"/>
+<field name="fub_num" class="java.lang.String"/>
+<field name="voucher_anio" class="java.lang.String"/>
+<field name="voucher_num" class="java.lang.String"/>
+<field name="oficina_num" class="java.lang.String"/>
+<background>
+<band splitType="Stretch"/>
+</background>
+<title>
+<band height="100" splitType="Stretch">
+<staticText>
+<reportElement x="0" y="0" width="250" height="20" uuid="e6f0d84c-2422-4b5e-95f3-f78578e8515e"/>
+<textElement verticalAlignment="Middle">
+<font size="10" isItalic="true"/>
+</textElement>
+<text><![CDATA[SERVICIO AGRICOLA Y GANADERO]]></text>
+</staticText>
+<staticText>
+<reportElement x="0" y="20" width="802" height="30" uuid="title-uuid"/>
+<textElement textAlignment="Center" verticalAlignment="Middle">
+<font size="16" isBold="true"/>
+</textElement>
+<text><![CDATA[PLANILLA DE INVENTARIO]]></text>
+</staticText>
+<textField>
+<reportElement x="0" y="50" width="802" height="20" uuid="sub-header-1"/>
+<textElement textAlignment="Center" verticalAlignment="Middle">
+<font size="10" isBold="true"/>
+</textElement>
+<textFieldExpression><![CDATA["Región: " + ({REGION_NAME} != null ? {REGION_NAME} : "") + "   Unidad: " + ({UNIT_NAME} != null ? {UNIT_NAME} : "") + "   Sector: " + ({SECTOR_NAME} != null ? {SECTOR_NAME} : "")]]></textFieldExpression>
+</textField>
+<textField>
+<reportElement x="0" y="70" width="802" height="20" uuid="sub-header-2"/>
+<textElement textAlignment="Center" verticalAlignment="Middle">
+<font size="10" isBold="true"/>
+</textElement>
+<textFieldExpression><![CDATA["Rango especies Desde: " + ({RANGO_DESDE} != null ? {RANGO_DESDE} : "") + " - Hasta: " + ({RANGO_HASTA} != null ? {RANGO_HASTA} : "")]]></textFieldExpression>
+</textField>
+<textField pattern="dd-MM-yyyy">
+<reportElement x="700" y="20" width="100" height="15" uuid="date-uuid"/>
+<textElement textAlignment="Right">
+<font size="9"/>
+</textElement>
+<textFieldExpression><![CDATA["Fecha: " + new java.text.SimpleDateFormat("dd-MM-yyyy").format(new java.util.Date())]]></textFieldExpression>
+</textField>
+<textField pattern="HH:mm:ss">
+<reportElement x="700" y="35" width="100" height="15" uuid="time-uuid"/>
+<textElement textAlignment="Right">
+<font size="9"/>
+</textElement>
+<textFieldExpression><![CDATA["Hora: " + new java.text.SimpleDateFormat("HH:mm:ss").format(new java.util.Date())]]></textFieldExpression>
+</textField>
+<textField>
+<reportElement x="700" y="5" width="100" height="15" uuid="page-uuid"/>
+<textElement textAlignment="Right">
+<font size="9"/>
+</textElement>
+<textFieldExpression><![CDATA["Página: " + {PAGE_NUMBER}]]></textFieldExpression>
+</textField>
+</band>
+</title>
+<columnHeader>
+<band height="50" splitType="Stretch">
+<!-- Row 1 -->
+<staticText>
+<reportElement x="0" y="0" width="60" height="50" uuid="h-bien"/>
+<box>
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement textAlignment="Center" verticalAlignment="Middle">
+<font size="9" isBold="true"/>
+</textElement>
+<text><![CDATA[Bien]]></text>
+</staticText>
+<staticText>
+<reportElement x="60" y="0" width="140" height="50" uuid="h-especie"/>
+<box>
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement textAlignment="Center" verticalAlignment="Middle">
+<font size="9" isBold="true"/>
+</textElement>
+<text><![CDATA[Especie]]></text>
+</staticText>
+<staticText>
+<reportElement x="200" y="0" width="140" height="50" uuid="h-datos"/>
+<box>
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement textAlignment="Center" verticalAlignment="Middle">
+<font size="9" isBold="true"/>
+</textElement>
+<text><![CDATA[Datos Adicionales]]></text>
+</staticText>
+
+<!-- Inscripcion Group -->
+<staticText>
+<reportElement x="340" y="0" width="310" height="20" uuid="h-insc-group"/>
+<box>
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement textAlignment="Center" verticalAlignment="Middle">
+<font size="9" isBold="true"/>
+</textElement>
+<text><![CDATA[Inscripción]]></text>
+</staticText>
+<!-- Subcolumns Inscripcion -->
+<staticText>
+<reportElement x="340" y="20" width="60" height="30" uuid="h-conservador"/>
+<box>
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement textAlignment="Center" verticalAlignment="Middle">
+<font size="8" isBold="true"/>
+</textElement>
+<text><![CDATA[Conservador]]></text>
+</staticText>
+<staticText>
+<reportElement x="400" y="20" width="50" height="30" uuid="h-inscripcion"/>
+<box>
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement textAlignment="Center" verticalAlignment="Middle">
+<font size="8" isBold="true"/>
+</textElement>
+<text><![CDATA[Inscripción]]></text>
+</staticText>
+<staticText>
+<reportElement x="450" y="20" width="30" height="30" uuid="h-anio"/>
+<box>
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement textAlignment="Center" verticalAlignment="Middle">
+<font size="8" isBold="true"/>
+</textElement>
+<text><![CDATA[Año]]></text>
+</staticText>
+<staticText>
+<reportElement x="480" y="20" width="40" height="30" uuid="h-rol"/>
+<box>
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement textAlignment="Center" verticalAlignment="Middle">
+<font size="8" isBold="true"/>
+</textElement>
+<text><![CDATA[Rol Avalúo]]></text>
+</staticText>
+<staticText>
+<reportElement x="520" y="20" width="50" height="30" uuid="h-motor"/>
+<box>
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement textAlignment="Center" verticalAlignment="Middle">
+<font size="8" isBold="true"/>
+</textElement>
+<text><![CDATA[Motor, fojas ó carro]]></text>
+</staticText>
+<staticText>
+<reportElement x="570" y="20" width="40" height="30" uuid="h-chasis"/>
+<box>
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement textAlignment="Center" verticalAlignment="Middle">
+<font size="8" isBold="true"/>
+</textElement>
+<text><![CDATA[Chasis]]></text>
+</staticText>
+<staticText>
+<reportElement x="610" y="20" width="40" height="30" uuid="h-placa"/>
+<box>
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement textAlignment="Center" verticalAlignment="Middle">
+<font size="8" isBold="true"/>
+</textElement>
+<text><![CDATA[Placa única]]></text>
+</staticText>
+
+<staticText>
+<reportElement x="650" y="0" width="40" height="50" uuid="h-estado"/>
+<box>
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement textAlignment="Center" verticalAlignment="Middle">
+<font size="9" isBold="true"/>
+</textElement>
+<text><![CDATA[Estado]]></text>
+</staticText>
+
+<!-- Fub Group -->
+<staticText>
+<reportElement x="690" y="0" width="40" height="20" uuid="h-fub-group"/>
+<box>
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement textAlignment="Center" verticalAlignment="Middle">
+<font size="9" isBold="true"/>
+</textElement>
+<text><![CDATA[Fub]]></text>
+</staticText>
+<staticText>
+<reportElement x="690" y="20" width="20" height="30" uuid="h-fub-anio"/>
+<box>
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement textAlignment="Center" verticalAlignment="Middle">
+<font size="8" isBold="true"/>
+</textElement>
+<text><![CDATA[Año]]></text>
+</staticText>
+<staticText>
+<reportElement x="710" y="20" width="20" height="30" uuid="h-fub-num"/>
+<box>
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement textAlignment="Center" verticalAlignment="Middle">
+<font size="8" isBold="true"/>
+</textElement>
+<text><![CDATA[Núm]]></text>
+</staticText>
+
+<!-- Voucher Group -->
+<staticText>
+<reportElement x="730" y="0" width="40" height="20" uuid="h-voucher-group"/>
+<box>
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement textAlignment="Center" verticalAlignment="Middle">
+<font size="9" isBold="true"/>
+</textElement>
+<text><![CDATA[Voucher]]></text>
+</staticText>
+<staticText>
+<reportElement x="730" y="20" width="20" height="30" uuid="h-voucher-anio"/>
+<box>
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement textAlignment="Center" verticalAlignment="Middle">
+<font size="8" isBold="true"/>
+</textElement>
+<text><![CDATA[Año]]></text>
+</staticText>
+<staticText>
+<reportElement x="750" y="20" width="20" height="30" uuid="h-voucher-num"/>
+<box>
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement textAlignment="Center" verticalAlignment="Middle">
+<font size="8" isBold="true"/>
+</textElement>
+<text><![CDATA[Núm]]></text>
+</staticText>
+
+<!-- Oficina Group -->
+<staticText>
+<reportElement x="770" y="0" width="32" height="20" uuid="h-oficina-group"/>
+<box>
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement textAlignment="Center" verticalAlignment="Middle">
+<font size="9" isBold="true"/>
+</textElement>
+<text><![CDATA[Oficina]]></text>
+</staticText>
+<staticText>
+<reportElement x="770" y="20" width="32" height="30" uuid="h-oficina-num"/>
+<box>
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement textAlignment="Center" verticalAlignment="Middle">
+<font size="8" isBold="true"/>
+</textElement>
+<text><![CDATA[Número]]></text>
+</staticText>
+</band>
+</columnHeader>
+<detail>
+<band height="20" splitType="Stretch">
+<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+<reportElement stretchType="ElementGroupHeight" x="0" y="0" width="60" height="20" uuid="d-bien"/>
+<box leftPadding="2" rightPadding="2">
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement verticalAlignment="Middle">
+<font size="8"/>
+</textElement>
+<textFieldExpression><![CDATA[{bien}]]></textFieldExpression>
+</textField>
+<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+<reportElement stretchType="ElementGroupHeight" x="60" y="0" width="140" height="20" uuid="d-especie"/>
+<box leftPadding="2" rightPadding="2">
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement verticalAlignment="Middle">
+<font size="8"/>
+</textElement>
+<textFieldExpression><![CDATA[{especie}]]></textFieldExpression>
+</textField>
+<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+<reportElement stretchType="ElementGroupHeight" x="200" y="0" width="140" height="20" uuid="d-datos"/>
+<box leftPadding="2" rightPadding="2">
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement verticalAlignment="Middle">
+<font size="8"/>
+</textElement>
+<textFieldExpression><![CDATA[{datos_adicionales}]]></textFieldExpression>
+</textField>
+<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+<reportElement stretchType="ElementGroupHeight" x="340" y="0" width="60" height="20" uuid="d-conservador"/>
+<box leftPadding="2" rightPadding="2">
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement verticalAlignment="Middle">
+<font size="8"/>
+</textElement>
+<textFieldExpression><![CDATA[{conservador}]]></textFieldExpression>
+</textField>
+<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+<reportElement stretchType="ElementGroupHeight" x="400" y="0" width="50" height="20" uuid="d-inscripcion"/>
+<box leftPadding="2" rightPadding="2">
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement verticalAlignment="Middle">
+<font size="8"/>
+</textElement>
+<textFieldExpression><![CDATA[{inscripcion}]]></textFieldExpression>
+</textField>
+<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+<reportElement stretchType="ElementGroupHeight" x="450" y="0" width="30" height="20" uuid="d-anio"/>
+<box leftPadding="2" rightPadding="2">
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement verticalAlignment="Middle">
+<font size="8"/>
+</textElement>
+<textFieldExpression><![CDATA[{anio_insc}]]></textFieldExpression>
+</textField>
+<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+<reportElement stretchType="ElementGroupHeight" x="480" y="0" width="40" height="20" uuid="d-rol"/>
+<box leftPadding="2" rightPadding="2">
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement verticalAlignment="Middle">
+<font size="8"/>
+</textElement>
+<textFieldExpression><![CDATA[{rol_avaluo}]]></textFieldExpression>
+</textField>
+<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+<reportElement stretchType="ElementGroupHeight" x="520" y="0" width="50" height="20" uuid="d-motor"/>
+<box leftPadding="2" rightPadding="2">
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement verticalAlignment="Middle">
+<font size="8"/>
+</textElement>
+<textFieldExpression><![CDATA[{motor}]]></textFieldExpression>
+</textField>
+<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+<reportElement stretchType="ElementGroupHeight" x="570" y="0" width="40" height="20" uuid="d-chasis"/>
+<box leftPadding="2" rightPadding="2">
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement verticalAlignment="Middle">
+<font size="8"/>
+</textElement>
+<textFieldExpression><![CDATA[{chasis}]]></textFieldExpression>
+</textField>
+<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+<reportElement stretchType="ElementGroupHeight" x="610" y="0" width="40" height="20" uuid="d-placa"/>
+<box leftPadding="2" rightPadding="2">
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement verticalAlignment="Middle">
+<font size="8"/>
+</textElement>
+<textFieldExpression><![CDATA[{placa}]]></textFieldExpression>
+</textField>
+<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+<reportElement stretchType="ElementGroupHeight" x="650" y="0" width="40" height="20" uuid="d-estado"/>
+<box leftPadding="2" rightPadding="2">
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement verticalAlignment="Middle">
+<font size="8"/>
+</textElement>
+<textFieldExpression><![CDATA[{estado}]]></textFieldExpression>
+</textField>
+<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+<reportElement stretchType="ElementGroupHeight" x="690" y="0" width="20" height="20" uuid="d-fub-anio"/>
+<box leftPadding="2" rightPadding="2">
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement verticalAlignment="Middle">
+<font size="8"/>
+</textElement>
+<textFieldExpression><![CDATA[{fub_anio}]]></textFieldExpression>
+</textField>
+<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+<reportElement stretchType="ElementGroupHeight" x="710" y="0" width="20" height="20" uuid="d-fub-num"/>
+<box leftPadding="2" rightPadding="2">
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement verticalAlignment="Middle">
+<font size="8"/>
+</textElement>
+<textFieldExpression><![CDATA[{fub_num}]]></textFieldExpression>
+</textField>
+<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+<reportElement stretchType="ElementGroupHeight" x="730" y="0" width="20" height="20" uuid="d-voucher-anio"/>
+<box leftPadding="2" rightPadding="2">
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement verticalAlignment="Middle">
+<font size="8"/>
+</textElement>
+<textFieldExpression><![CDATA[{voucher_anio}]]></textFieldExpression>
+</textField>
+<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+<reportElement stretchType="ElementGroupHeight" x="750" y="0" width="20" height="20" uuid="d-voucher-num"/>
+<box leftPadding="2" rightPadding="2">
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement verticalAlignment="Middle">
+<font size="8"/>
+</textElement>
+<textFieldExpression><![CDATA[{voucher_num}]]></textFieldExpression>
+</textField>
+<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+<reportElement stretchType="ElementGroupHeight" x="770" y="0" width="32" height="20" uuid="d-oficina-num"/>
+<box leftPadding="2" rightPadding="2">
+<topPen lineWidth="0.5"/>
+<leftPen lineWidth="0.5"/>
+<bottomPen lineWidth="0.5"/>
+<rightPen lineWidth="0.5"/>
+</box>
+<textElement verticalAlignment="Middle">
+<font size="8"/>
+</textElement>
+<textFieldExpression><![CDATA[{oficina_num}]]></textFieldExpression>
+</textField>
+</band>
+</detail>
+</jasperReport>

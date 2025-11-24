@@ -1,0 +1,80 @@
+name: Deploy SIAF Report
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-siaf-report
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: 'maven'
+
+      - name: Maven build (package)
+        run: ./mvnw -B clean package -DskipTests
+
+      - name: Prepare Quarkus artifact
+        run: |
+          ART_DIR=target/quarkus-app
+          if [ ! -d "$ART_DIR" ]; then echo "Quarkus build directory not found"; exit 1; fi
+          tar -czf quarkus-app.tar.gz -C "$ART_DIR" .
+
+      - name: Add SSH known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Start SSH agent with private key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+
+      - name: Upload artifact to server
+        run: scp quarkus-app.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/tmp/siaf-report-quarkus-app.tar.gz
+
+      - name: Deploy on server (Direct)
+        run: |
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
+            set -e;
+            # Definir ruta base
+            REPORT_PATH='/opt/siaf-report';
+            
+            # Detener servicio si existe
+            if systemctl is-active --quiet siaf-report; then
+                systemctl stop siaf-report;
+            fi
+            
+            # Limpiar directorio destino (manteniendo la carpeta)
+            # rm -rf \"\$REPORT_PATH\"/*  <-- Opcional: limpiar todo antes
+            
+            # Descomprimir directamente en /opt/siaf-report
+            tar -xzf /tmp/siaf-report-quarkus-app.tar.gz -C \"\$REPORT_PATH\";
+            
+            # Limpiar temporal
+            rm /tmp/siaf-report-quarkus-app.tar.gz;
+            
+            # Reiniciar servicio
+            if systemctl list-units --type=service | grep -q 'siaf-report'; then
+              systemctl start siaf-report;
+              systemctl status --no-pager siaf-report;
+            else
+              echo 'Service siaf-report not found. Please install the service file.';
+            fi;
+          "
+
+      - name: Post-deploy summary
+        run: echo "Deployment finished to /opt/siaf-report"
