@@ -7,7 +7,6 @@ import com.lowagie.text.Element;
 import com.lowagie.text.Font;
 import com.lowagie.text.FontFactory;
 import com.lowagie.text.PageSize;
-import com.lowagie.text.Paragraph;
 import com.lowagie.text.Phrase;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
@@ -16,7 +15,6 @@ import com.lowagie.text.pdf.PdfPageEventHelper;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.io.ByteArrayOutputStream;
@@ -33,7 +31,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 @Path("/report")
-public class AssetReportResource {
+public class InventoryReportResource {
 
     @Inject
     AgroalDataSource dataSource;
@@ -41,8 +39,16 @@ public class AssetReportResource {
     @Inject
     ObjectMapper objectMapper;
 
+    // Variables para el cabezado del reporte
+    private String headerRegionName = "";
+    private String headerUnitName = "";
+    private String headerSector = "";
+    private String headerBuilding = "";
+    private String headerFromAsset = "";
+    private String headerToAsset = "";
+
     @POST
-    @Path("/asset")
+    @Path("/inventory")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response generateReport(String jsonPayload) {
         try {
@@ -124,7 +130,7 @@ public class AssetReportResource {
             int rowNum = 3;
 
             try (Connection conn = dataSource.getConnection();
-                 PreparedStatement ps = conn.prepareStatement("SELECT * FROM read_asset_report(?::json)")) {
+                 PreparedStatement ps = conn.prepareStatement("SELECT * FROM read_inventory_report(?::json)")) {
                 
                 ps.setString(1, jsonPayload);
                 
@@ -186,8 +192,15 @@ public class AssetReportResource {
     }
 
     private Response generatePdf(String jsonPayload, String reportType) throws Exception {
+        // Extraer parámetros del JSON para el cabezado
+        JsonNode params = objectMapper.readTree(jsonPayload);
+        headerSector = params.has("sector") ? params.get("sector").asText("") : "";
+        headerBuilding = params.has("building") ? params.get("building").asText("") : "";
+        headerFromAsset = params.has("fromAsset") ? params.get("fromAsset").asText("") : "";
+        headerToAsset = params.has("toAsset") ? params.get("toAsset").asText("") : "";
+
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            Document document = new Document(PageSize.A4.rotate(), 20, 20, 30, 20);
+            Document document = new Document(PageSize.A4.rotate(), 20, 20, 70, 20);
             PdfWriter writer = PdfWriter.getInstance(document, out);
             
             // Add Header Event
@@ -195,26 +208,8 @@ public class AssetReportResource {
             
             document.open();
 
-            // --- Title ---
-            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14);
-            Paragraph title = new Paragraph("PLANILLA DE INVENTARIO", titleFont);
-            title.setAlignment(Element.ALIGN_CENTER);
-            title.setSpacingAfter(5);
-            document.add(title);
-
-            // --- Subtitle (Region & Unit) ---
-            Font subtitleFont = FontFactory.getFont(FontFactory.HELVETICA, 10);
-            String subtitleText = "";
-            
-            // We need to fetch at least one row to get region/unit names
-            // Since we iterate later, we'll use a scrollable ResultSet or just fetch first row separately?
-            // Better approach: The query returns regionName/unitName in every row.
-            // We can read the first row, print the subtitle, and then process the rows.
-            // However, ResultSet is forward-only by default.
-            // Let's use a scrollable ResultSet.
-
             try (Connection conn = dataSource.getConnection();
-                 PreparedStatement ps = conn.prepareStatement("SELECT * FROM read_asset_report(?::json)", 
+                 PreparedStatement ps = conn.prepareStatement("SELECT * FROM read_inventory_report(?::json)", 
                     ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
                 
                 ps.setString(1, jsonPayload);
@@ -222,25 +217,17 @@ public class AssetReportResource {
                 try (ResultSet rs = ps.executeQuery()) {
                     
                     if (rs.next()) {
-                        String regionName = rs.getString("regionName");
-                        String unitName = rs.getString("unitName");
-                        
-                        subtitleText = "REGIÓN: " + (regionName != null ? regionName : "TODAS") + 
-                                     " - UNIDAD: " + (unitName != null ? unitName : "TODAS");
-                        
-                        Paragraph subtitle = new Paragraph(subtitleText, subtitleFont);
-                        subtitle.setAlignment(Element.ALIGN_CENTER);
-                        subtitle.setSpacingAfter(10);
-                        document.add(subtitle);
+                        // Obtener nombres para el cabezado
+                        headerRegionName = rs.getString("regionName");
+                        headerUnitName = rs.getString("unitName");
+                        if (headerRegionName == null) headerRegionName = "TODAS";
+                        if (headerUnitName == null) headerUnitName = "TODAS";
                         
                         // Reset cursor to before first row so while(rs.next()) works correctly
                         rs.beforeFirst();
                     } else {
-                         // No data found case
-                        Paragraph subtitle = new Paragraph("NO SE ENCONTRARON DATOS", subtitleFont);
-                        subtitle.setAlignment(Element.ALIGN_CENTER);
-                        subtitle.setSpacingAfter(10);
-                        document.add(subtitle);
+                        headerRegionName = "TODAS";
+                        headerUnitName = "TODAS";
                     }
 
                     // --- Table Setup ---
@@ -346,35 +333,100 @@ public class AssetReportResource {
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         cell.setPadding(2);
+        cell.setMinimumHeight(20f); // Doble alto para evitar palabras cortadas
         table.addCell(cell);
     }
 
     // Inner class for Header/Footer
     class HeaderFooterPageEvent extends PdfPageEventHelper {
         Font headerFont = FontFactory.getFont(FontFactory.HELVETICA, 8);
+        Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
+        Font filterFont = FontFactory.getFont(FontFactory.HELVETICA, 8);
 
         @Override
         public void onEndPage(PdfWriter writer, Document document) {
-            PdfPTable headerTable = new PdfPTable(2);
-            headerTable.setTotalWidth(document.getPageSize().getWidth() - document.leftMargin() - document.rightMargin());
-            headerTable.setLockedWidth(true);
-            headerTable.getDefaultCell().setBorder(0);
+            float pageWidth = document.getPageSize().getWidth() - document.leftMargin() - document.rightMargin();
+            float yPosition = document.getPageSize().getHeight() - 15;
+            
+            // --- Línea 1: SERVICIO AGRICOLA Y GANADERO | Fecha Hora ---
+            PdfPTable line1 = new PdfPTable(2);
+            line1.setTotalWidth(pageWidth);
+            line1.setLockedWidth(true);
+            line1.getDefaultCell().setBorder(0);
 
-            // Left: Service Name
             PdfPCell leftCell = new PdfPCell(new Phrase("SERVICIO AGRICOLA Y GANADERO", headerFont));
             leftCell.setBorder(0);
             leftCell.setHorizontalAlignment(Element.ALIGN_LEFT);
-            headerTable.addCell(leftCell);
+            line1.addCell(leftCell);
 
-            // Right: Page, Date, Time
-            String date = new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new Date());
-            String pageInfo = "Página " + writer.getPageNumber() + " - " + date;
-            PdfPCell rightCell = new PdfPCell(new Phrase(pageInfo, headerFont));
+            String dateTime = new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new Date());
+            PdfPCell rightCell = new PdfPCell(new Phrase(dateTime, headerFont));
             rightCell.setBorder(0);
             rightCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            headerTable.addCell(rightCell);
+            line1.addCell(rightCell);
 
-            headerTable.writeSelectedRows(0, -1, document.leftMargin(), document.getPageSize().getHeight() - 10, writer.getDirectContent());
+            line1.writeSelectedRows(0, -1, document.leftMargin(), yPosition, writer.getDirectContent());
+            yPosition -= 12;
+
+            // --- Línea 2: PLANILLA DE INVENTARIO (centro) | Página (derecha) ---
+            PdfPTable line2 = new PdfPTable(3);
+            line2.setTotalWidth(pageWidth);
+            line2.setLockedWidth(true);
+            line2.getDefaultCell().setBorder(0);
+            float[] widths2 = {1f, 2f, 1f};
+            try {
+                line2.setWidths(widths2);
+            } catch (Exception e) { }
+
+            PdfPCell emptyCell = new PdfPCell(new Phrase(""));
+            emptyCell.setBorder(0);
+            line2.addCell(emptyCell);
+
+            PdfPCell titleCell = new PdfPCell(new Phrase("PLANILLA DE INVENTARIO", titleFont));
+            titleCell.setBorder(0);
+            titleCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            line2.addCell(titleCell);
+
+            PdfPCell pageCell = new PdfPCell(new Phrase("Página " + writer.getPageNumber(), headerFont));
+            pageCell.setBorder(0);
+            pageCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            line2.addCell(pageCell);
+
+            line2.writeSelectedRows(0, -1, document.leftMargin(), yPosition, writer.getDirectContent());
+            yPosition -= 14;
+
+            // --- Línea 3: Filtros (Región, Unidad, Sector, Edificio, Especies) ---
+            StringBuilder filters = new StringBuilder();
+            filters.append("Región: ").append(headerRegionName != null && !headerRegionName.isEmpty() ? headerRegionName : "TODAS");
+            filters.append(" - Unidad: ").append(headerUnitName != null && !headerUnitName.isEmpty() ? headerUnitName : "TODAS");
+            filters.append(" - Sec: ").append(headerSector != null && !headerSector.isEmpty() ? headerSector : "TODOS");
+            filters.append(" - Edif: ").append(headerBuilding != null && !headerBuilding.isEmpty() ? headerBuilding : "TODOS");
+            
+            // Especies
+            if ((headerFromAsset != null && !headerFromAsset.isEmpty()) || (headerToAsset != null && !headerToAsset.isEmpty())) {
+                filters.append(" - Especies: ");
+                if (headerFromAsset != null && !headerFromAsset.isEmpty()) {
+                    filters.append(headerFromAsset);
+                }
+                if (headerToAsset != null && !headerToAsset.isEmpty()) {
+                    if (headerFromAsset != null && !headerFromAsset.isEmpty()) {
+                        filters.append(" a ");
+                    }
+                    filters.append(headerToAsset);
+                }
+            }
+
+            PdfPTable line3 = new PdfPTable(1);
+            line3.setTotalWidth(pageWidth);
+            line3.setLockedWidth(true);
+            line3.getDefaultCell().setBorder(0);
+
+            PdfPCell filterCell = new PdfPCell(new Phrase(filters.toString(), filterFont));
+            filterCell.setBorder(0);
+            filterCell.setHorizontalAlignment(Element.ALIGN_LEFT);
+            line3.addCell(filterCell);
+
+            line3.writeSelectedRows(0, -1, document.leftMargin(), yPosition, writer.getDirectContent());
         }
     }
 }
