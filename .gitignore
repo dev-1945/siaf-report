@@ -1,7 +1,9 @@
 target/
+log/
+pdf/
 .idea/
 .vscode/
 *.iml
 .DS_Store
-log/*.log
-!log/.gitkeep
+*.log
+.mvn/wrapper/maven-wrapper.jar
